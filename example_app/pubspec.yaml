@@ -1,0 +1,24 @@
+name: otel_logging_example_app
+description: Runnable demo of otel_logging against
+  a local LGTM stack (Grafana / Loki / Tempo / Mimir). Emits
+  package:logging records at every Level and shows the
+  trace_id / span_id correlation that the bridge attaches when the
+  record is emitted inside an active span.
+publish_to: none
+version: 0.0.1
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  otel_logging:
+    path: ..
+  # Example apps use the Pro SDK to demonstrate the one-character
+  # switch (OTel.initialize -> DOTel.initialize). The package itself
+  # still depends only on the OSS SDK so non-Pro users can keep it.
+  dartastic_opentelemetry_pro:
+    path: ../../../pro/dartastic_opentelemetry_pro
+  logging: ^1.3.0
+
+dev_dependencies:
+  dart_flutter_team_lints: ^3.5.2
