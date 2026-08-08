@@ -6,6 +6,8 @@ import 'dart:async';
 import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
 import 'package:logging/logging.dart' as dart_logging;
 
+import 'logging_semantics.dart';
+
 /// Bridges `package:logging` records into the OpenTelemetry logs SDK.
 ///
 /// `package:logging` is the de-facto-standard Dart logging package — every
@@ -120,16 +122,18 @@ class PackageLoggingBridge {
 
     final attrMap = <String, Object>{};
     if (rec.error != null) {
-      attrMap['exception.type'] = rec.error.runtimeType.toString();
-      attrMap['exception.message'] = rec.error.toString();
+      attrMap[ExceptionAttributes.exceptionType.key] =
+          rec.error.runtimeType.toString();
+      attrMap[ExceptionAttributes.exceptionMessage.key] = rec.error.toString();
     }
     if (rec.stackTrace != null) {
-      attrMap['exception.stacktrace'] = rec.stackTrace.toString();
+      attrMap[ExceptionAttributes.exceptionStacktrace.key] =
+          rec.stackTrace.toString();
     }
     if (rec.zone != null) {
       // Optional: surface the zone hash so multi-isolate or
       // background-zone logs can be correlated.
-      attrMap['logging.zone'] = rec.zone.hashCode.toString();
+      attrMap[LoggingSemantics.zone.key] = rec.zone.hashCode.toString();
     }
 
     // `_onRecord` runs in the zone where the bridge was installed — NOT

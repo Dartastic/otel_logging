@@ -6,4 +6,5 @@
 /// See [PackageLoggingBridge] for usage.
 library;
 
+export 'src/logging_semantics.dart';
 export 'src/package_logging_bridge.dart';

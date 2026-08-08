@@ -2,28 +2,25 @@
 // Copyright 2025, Mindful Software LLC, All rights reserved.
 
 /// Runnable demo of `otel_logging` against a local
-/// LGTM stack.
+/// OTLP-capable backend.
 ///
-/// Run the stack:
-///   docker compose -f ../../../tool/lgtm/docker-compose.yml up -d
+/// Start one (any open-source all-in-one dev-observability container
+/// works well) listening on 4317 (gRPC) and 4318 (HTTP).
 ///
 /// Then run this app:
 ///   dart run bin/main.dart
 ///
-/// Open Grafana (http://localhost:3000), pick the Loki datasource in
-/// Explore, query `{service_name="logging-bridge-example-app"}`. Each
+/// Open your backend's UI, select the logs data source, and query
+/// `{service_name="logging-bridge-example-app"}`. Each
 /// emitted record carries the level → OTel severity mapping; records
 /// emitted inside an active span also carry the trace_id / span_id of
-/// that span so you can pivot from Loki to Tempo with one click.
+/// that span so you can pivot from logs to the trace with one click.
 library;
 
 import 'dart:async';
 import 'dart:io';
 
-// Example apps use the Pro SDK to demonstrate the one-character
-// switch (OTel.initialize -> DOTel.initialize). The package source
-// still imports the OSS SDK directly so non-Pro users can use it.
-import 'package:dartastic_opentelemetry_pro/dartastic_opentelemetry_pro.dart';
+import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
 import 'package:logging/logging.dart';
 import 'package:otel_logging/otel_logging.dart';
 
@@ -38,7 +35,7 @@ Future<void> main(List<String> args) async {
 
   print('==> exporting to $endpoint as $_serviceName');
 
-  await DOTel.initialize(
+  await OTel.initialize(
     serviceName: _serviceName,
     serviceVersion: '0.0.1',
     endpoint: endpoint,
@@ -47,8 +44,8 @@ Future<void> main(List<String> args) async {
   PackageLoggingBridge.install();
   Logger.root.level = Level.ALL;
 
-  // Off-span — these log records carry no trace context, so in Loki
-  // they appear as standalone entries with no Tempo pivot.
+  // Off-span — these log records carry no trace context, so in the
+  // logs view they appear as standalone entries with no trace pivot.
   Logger('startup').finest('finest — TRACE2');
   Logger('startup').finer('finer — TRACE2');
   Logger('startup').fine('fine — DEBUG');
@@ -56,9 +53,9 @@ Future<void> main(List<String> args) async {
   Logger('startup').info('process started');
 
   // In-span — every record inside this active span inherits trace_id
-  // / span_id from Context.current, so Loki entries pivot straight to
-  // the Tempo trace via Grafana's datasource correlation.
-  await DOTel.tracer().startActiveSpanAsync<void>(
+  // / span_id from Context.current, so log entries pivot straight to
+  // the trace via the backend's datasource correlation.
+  await OTel.tracer().startActiveSpanAsync<void>(
     name: 'handle-request',
     fn: (_) async {
       Logger('handler').info('received request');
@@ -83,9 +80,9 @@ Future<void> main(List<String> args) async {
 
   print('==> flushing + shutting down');
   await PackageLoggingBridge.uninstall();
-  await DOTel.shutdown();
-  print('==> done. open Grafana at http://localhost:3000 → Explore → '
-      'Loki, {service_name="$_serviceName"}');
+  await OTel.shutdown();
+  print('==> done. query your logs backend for '
+      '{service_name="$_serviceName"}');
 }
 
 /// Throws on purpose so the example surfaces the

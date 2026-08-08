@@ -124,9 +124,16 @@ void main() {
         for (final a in rec.attributes!.toList()) a.key: a.value,
       };
 
+      // Assert against the literal registry keys (not the enum) so a
+      // key regression in the enum itself can't hide from this test.
       expect(attrs['exception.type'], equals('StateError'));
       expect(attrs['exception.message'].toString(), contains('boom'));
       expect(attrs['exception.stacktrace'], isNotNull);
+      expect(
+        ExceptionAttributes.exceptionType.key,
+        equals('exception.type'),
+        reason: 'lib emits via ExceptionAttributes — keep wire keys pinned',
+      );
     });
 
     test('uninstall cancels the subscription — no further emits', () async {

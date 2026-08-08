@@ -1,17 +1,17 @@
 # otel_logging example app
 
 A standalone runnable demo of `otel_logging`
-exporting telemetry to a local LGTM stack (Grafana + Loki + Tempo +
-Mimir).
+exporting telemetry to a local OTLP-capable backend (any open-source
+all-in-one dev-observability container works).
 
 ## Run
 
 ```sh
-# 1. Start the LGTM stack (from the dartastic-pro repo root)
-docker compose -f tool/lgtm/docker-compose.yml up -d
+# 1. Start any OTLP-compatible backend that also exposes a logs UI or
+#    query API, listening on 4317 (gRPC) and 4318 (HTTP).
 
 # 2. Run the app
-cd dart/otel_logging/example_app
+cd example_app
 dart pub get
 dart run bin/main.dart
 ```
@@ -38,11 +38,11 @@ correlation).
 
 ## Where to look
 
-Grafana → Explore → Loki:
+In your logs backend, search for:
 
 - Query: `{service_name="logging-bridge-example-app"}`
-- Records with a `trace_id` field have a "view trace" link that
-  pivots to the corresponding Tempo trace.
+- Records with a `trace_id` field pivot to the corresponding trace in
+  any backend that correlates logs to traces.
 - The `db call failed` record carries `exception.type`,
   `exception.message`, and `exception.stacktrace` attributes.
 
