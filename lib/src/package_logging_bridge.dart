@@ -3,7 +3,7 @@
 
 import 'dart:async';
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 import 'package:logging/logging.dart' as dart_logging;
 
 import 'logging_semantics.dart';
@@ -35,14 +35,14 @@ import 'logging_semantics.dart';
 /// [OTel.shutdown] is the safest order.
 class PackageLoggingBridge {
   PackageLoggingBridge._({
-    required LoggerProvider provider,
+    required APILoggerProvider provider,
     required String defaultLoggerName,
     required Severity minimumSeverity,
   })  : _provider = provider,
         _defaultLoggerName = defaultLoggerName,
         _minimumSeverity = minimumSeverity;
 
-  final LoggerProvider _provider;
+  final APILoggerProvider _provider;
   final String _defaultLoggerName;
   final Severity _minimumSeverity;
 
@@ -72,12 +72,12 @@ class PackageLoggingBridge {
   ///
   /// Calling [install] when a bridge is already installed replaces it.
   static PackageLoggingBridge install({
-    LoggerProvider? loggerProvider,
+    APILoggerProvider? loggerProvider,
     String defaultLoggerName = 'package.logging',
     Severity minimumSeverity = Severity.TRACE,
   }) {
     _instance?._cancel();
-    final provider = loggerProvider ?? OTel.loggerProvider();
+    final provider = loggerProvider ?? OTelAPI.loggerProvider();
     final bridge = PackageLoggingBridge._(
       provider: provider,
       defaultLoggerName: defaultLoggerName,
@@ -149,7 +149,7 @@ class PackageLoggingBridge {
         severityNumber: severity,
         severityText: severity.name,
         body: rec.message,
-        attributes: attrMap.isEmpty ? null : OTel.attributesFromMap(attrMap),
+        attributes: attrMap.isEmpty ? null : OTelAPI.attributesFromMap(attrMap),
       );
     });
   }
