@@ -1,8 +1,7 @@
 name: otel_logging
 description: >-
-  Bridge `package:logging` records into the OpenTelemetry logs SDK so
-  trace_id / span_id correlation works automatically for any Dart app using
-  the standard logging package.
+  OpenTelemetry instrumentation for logging by Dartastic.io. Adds standard
+  OpenTelemetry observability to applications that use logging.
 version: 0.3.1-wip
 repository: https://github.com/dartastic/otel_logging
 homepage: https://dartastic.io
