@@ -2,7 +2,7 @@ name: otel_logging
 description: >-
   OpenTelemetry instrumentation for logging by Dartastic.io. Adds standard
   OpenTelemetry observability to applications that use logging.
-version: 0.3.1-wip
+version: 0.3.1
 repository: https://github.com/dartastic/otel_logging
 homepage: https://dartastic.io
 
